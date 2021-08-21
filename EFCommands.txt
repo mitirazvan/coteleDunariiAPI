@@ -1,0 +1,5 @@
+﻿// add migration
+add-migration migrationName -c CoteleDunariiContext
+
+// update database
+update-database
