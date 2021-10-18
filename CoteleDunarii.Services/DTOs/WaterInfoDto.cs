@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CoteleDunarii.Services.DTOs
+namespace CoteleDunarii.Services.Dtos
 {
     public class WaterInfoDto
     {

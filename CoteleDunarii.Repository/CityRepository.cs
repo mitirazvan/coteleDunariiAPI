@@ -12,51 +12,51 @@ namespace CoteleDunarii.Repository
 {
     public class CityRepository : ICityRepostirory
     {
-        private CoteleDunariiContext Context;
-        private ILogger<CityRepository> Log;
+        private CoteleDunariiContext _context;
+        private ILogger<CityRepository> _log;
 
         public CityRepository(CoteleDunariiContext db, ILogger<CityRepository> logger)
         {
-            Context = db;
-            Log = logger;
+            _context = db;
+            _log = logger;
 
         }
 
-        public async Task<bool> AddWaterEstimationsAsync(int CityId, WaterEstimations waterEstimations)
+        public async Task<bool> AddWaterEstimationsAsync(int cityId, WaterEstimations waterEstimations)
         {
-            var city = await Context.Cities.Where(x => x.CityId == CityId).FirstOrDefaultAsync();
-            if (city != null)
+            var city = await _context.Cities.Where(x => x.CityId == cityId).FirstOrDefaultAsync();
+            if (city != null && (await CanInsertWaterEstimationsAsync(cityId, waterEstimations.ReadTime)))
             {
                 waterEstimations.City = city;
                 try
                 {
-                    await Context.WaterEstimations.AddAsync(waterEstimations);
-                    await Context.SaveChangesAsync();
+                    await _context.WaterEstimations.AddAsync(waterEstimations);
+                    await _context.SaveChangesAsync();
                     return true;
                 }
                 catch (Exception e)
                 {
-                    Log.LogError(e, "Repository: failed to save WaterEstimation");
+                    _log.LogError(e, "Repository: failed to save WaterEstimation");
                 }
             }
             return false;
         }
 
-        public async Task<bool> AddWaterInfoAsync(int CityId, WaterInfo waterInfo)
+        public async Task<bool> AddWaterInfoAsync(int cityId, WaterInfo waterInfo)
         {
-            var city = await Context.Cities.Where(x => x.CityId == CityId).FirstOrDefaultAsync();
-            if (city != null)
+            var city = await _context.Cities.Where(x => x.CityId == cityId).FirstOrDefaultAsync();
+            if (city != null && (await CanInsertWaterInfoAsync(cityId, waterInfo.ReadTime)))
             {
                 waterInfo.City = city;
                 try
                 {
-                    await Context.WaterInfos.AddAsync(waterInfo);
-                    await Context.SaveChangesAsync();
+                    await _context.WaterInfos.AddAsync(waterInfo);
+                    await _context.SaveChangesAsync();
                     return true;
                 }
                 catch (Exception e)
                 {
-                    Log.LogError(e, "Repository: failed to save waterInfo");
+                    _log.LogError(e, "Repository: failed to save waterInfo");
                 }
             }
             return false;
@@ -64,7 +64,7 @@ namespace CoteleDunarii.Repository
 
         public async Task<List<City>> GetCitiesAsync()
         {
-            return await Context.Cities
+            return await _context.Cities
                 .Include(y => y.waterEstimations)
                 .Include(z => z.waterInfos)
                 .ToListAsync();
@@ -72,7 +72,7 @@ namespace CoteleDunarii.Repository
 
         public async Task<City> GetCityAsync(string name)
         {
-            return await Context.Cities.Where(x => x.Name == name)
+            return await _context.Cities.Where(x => x.Name == name)
                 .Include(y => y.waterEstimations)
                 .Include(z => z.waterInfos)
                 .FirstOrDefaultAsync();
@@ -80,12 +80,12 @@ namespace CoteleDunarii.Repository
 
         public async Task<int> GetCityIdAsync(string name)
         {
-            var city = await Context.Cities.Where(x => x.Name == name).FirstOrDefaultAsync();
+            var city = await _context.Cities.Where(x => x.Name == name).FirstOrDefaultAsync();
             if (city != null)
                 return city.CityId;
             else
             {
-                Log.LogWarning($"Repository: City with {name} doesn't exists!");
+                _log.LogWarning($"Repository: City with {name} doesn't exists!");
                 return -1;
             }
 
@@ -95,15 +95,24 @@ namespace CoteleDunarii.Repository
         {
             try
             {
-                await Context.AddAsync(city);
-                await Context.SaveChangesAsync();
+                await _context.AddAsync(city);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception e)
             {
-                Log.LogError(e, "Repository: failed to save City");
+                _log.LogError(e, "Repository: failed to save City");
                 return false;
             }
+        }
+
+        private async Task<bool> CanInsertWaterInfoAsync(int cityId, DateTime readTime)
+        {
+            return !(await _context.WaterInfos.AnyAsync(x => x.City.CityId == cityId && x.ReadTime == readTime));
+        }
+        private async Task<bool> CanInsertWaterEstimationsAsync(int cityId, DateTime readTime)
+        {
+            return !(await _context.WaterEstimations.AnyAsync(x => x.City.CityId == cityId && x.ReadTime == readTime));
         }
     }
 }

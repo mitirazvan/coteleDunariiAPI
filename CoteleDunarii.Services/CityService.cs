@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CoteleDunarii.Repository.Interfaces;
-using CoteleDunarii.Services.DTOs;
+using CoteleDunarii.Services.Dtos;
 using CoteleDunarii.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -33,9 +33,23 @@ namespace CoteleDunarii.Services
             return _mapper.Map<CityDto>(city);
         }
 
-        public Task SaveCity(CityDto city)
+        public async Task SaveCity(CityDto city)
         {
-            throw new System.NotImplementedException();
+            // check if city exists:
+            var cityFromDb = await _cityRepostirory.GetCityAsync(city.Name);
+            if (cityFromDb == null)
+            {
+                var entity = _mapper.Map<Data.Models.City>(city);
+                await _cityRepostirory.SaveCityAsync(entity);
+            }
+            else
+            {
+                var waterEstEntity = _mapper.Map<Data.Models.WaterEstimations>(city.WaterEstimations[0]);
+                await _cityRepostirory.AddWaterEstimationsAsync(cityFromDb.CityId, waterEstEntity);
+
+                var waterInfoEntity = _mapper.Map<Data.Models.WaterInfo>(city.WaterInfos[0]);
+                await _cityRepostirory.AddWaterInfoAsync(cityFromDb.CityId, waterInfoEntity);
+            }
         }
     }
 }

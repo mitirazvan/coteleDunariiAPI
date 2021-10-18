@@ -1,9 +1,9 @@
-﻿using CoteleDunarii.Data;
-using CoteleDunarii.Data.Models;
+﻿using CoteleDunarii.Services.Dtos;
+using CoteleDunarii.Services.Interfaces;
 using HtmlAgilityPack;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,12 +25,12 @@ namespace CoteleDunarii.WebServices.WebScrapper
 
         private readonly string _adfjUrl = "http://www.afdj.ro/ro/cotele-dunarii";
         private ILogger<AdfjScrapper> _logger;
-        private CoteleDunariiContext _db;
+        private ICityService _service;
 
-        public AdfjScrapper(ILogger<AdfjScrapper> logger, CoteleDunariiContext dbContext)
+        public AdfjScrapper(ILogger<AdfjScrapper> logger, ICityService service)
         {
             _logger = logger;
-            _db = dbContext;
+            _service = service;
         }
 
         public async Task<bool> RetrieveData()
@@ -58,50 +58,31 @@ namespace CoteleDunarii.WebServices.WebScrapper
             {
                 try
                 {
-                    //string cityName = tableValues[index + kLocalitatea].Cell_Text;
-                    //var cityFromDb = await _db.City.Where(x => x.Name == cityName).Include(y => y.waterEstimations).Include(z => z.waterInfo).FirstOrDefaultAsync();
-                    //if (cityFromDb != null)
-                    //{
-                    //    cityFromDb.waterInfo.Elevation = tableValues[index + kNivelulApei].Cell_Text;
-                    //    cityFromDb.waterInfo.Temperature = tableValues[index + kTemperaturaMasurata].Cell_Text;
-                    //    cityFromDb.waterInfo.Variation = Convert.ToInt32(tableValues[index + kVariatia].Cell_Text);
-                    //    cityFromDb.waterInfo.ReadTime = DateTime.ParseExact(tableValues[index + kDataActualizarii].Cell_Text, "dd/MM/yyyy", null);
+                    string cityName = tableValues[index + kLocalitatea].Cell_Text;
 
-                    //    cityFromDb.waterEstimations.ReadTime = DateTime.ParseExact(tableValues[index + kDataActualizarii].Cell_Text, "dd/MM/yyyy", null);
-                    //    cityFromDb.waterEstimations.Next24h = tableValues[index + k24H].Cell_Text;
-                    //    cityFromDb.waterEstimations.Next48h = tableValues[index + k48H].Cell_Text;
-                    //    cityFromDb.waterEstimations.Next72h = tableValues[index + k72H].Cell_Text;
-                    //    cityFromDb.waterEstimations.Next96h = tableValues[index + k96H].Cell_Text;
-                    //    cityFromDb.waterEstimations.Next120h = tableValues[index + k120H].Cell_Text;
+                    var city = new CityDto
+                    {
+                        Name = cityName,
+                        Km = tableValues[index + kKms].Cell_Text,
+                        WaterInfos = new List<WaterInfoDto>{new WaterInfoDto
+                        {
+                            Elevation = tableValues[index + kNivelulApei].Cell_Text,
+                            Temperature = tableValues[index + kTemperaturaMasurata].Cell_Text,
+                            Variation = Convert.ToInt32(tableValues[index + kVariatia].Cell_Text),
+                            ReadTime = DateTime.ParseExact(tableValues[index + kDataActualizarii].Cell_Text, "dd/MM/yyyy", null)
+                        }},
+                        WaterEstimations = new List<WaterEstimationDto>{ new WaterEstimationDto
+                        {
+                            ReadTime = DateTime.ParseExact(tableValues[index + kDataActualizarii].Cell_Text, "dd/MM/yyyy", null),
+                            Next24h = tableValues[index + k24H].Cell_Text,
+                            Next48h = tableValues[index + k48H].Cell_Text,
+                            Next72h = tableValues[index + k72H].Cell_Text,
+                            Next96h = tableValues[index + k96H].Cell_Text,
+                            Next120h = tableValues[index + k120H].Cell_Text,
+                        }}
+                    };
+                    await _service.SaveCity(city);
 
-                    //    _db.City.Update(cityFromDb);
-                    //}
-                    //else
-                    //{
-                    //    //var city = new City
-                    //    //{
-                    //    //    Name = cityName,
-                    //    //    Km = tableValues[index + kKms].Cell_Text,
-                    //    //    waterInfo = new WaterInfo
-                    //    //    {
-                    //    //        Elevation = tableValues[index + kNivelulApei].Cell_Text,
-                    //    //        Temperature = tableValues[index + kTemperaturaMasurata].Cell_Text,
-                    //    //        Variation = Convert.ToInt32(tableValues[index + kVariatia].Cell_Text),
-                    //    //        ReadTime = DateTime.ParseExact(tableValues[index + kDataActualizarii].Cell_Text, "dd/MM/yyyy", null)
-                    //    //    },
-                    //    //    waterEstimations = new WaterEstimations
-                    //    //    {
-                    //    //        ReadTime = DateTime.ParseExact(tableValues[index + kDataActualizarii].Cell_Text, "dd/MM/yyyy", null),
-                    //    //        Next24h = tableValues[index + k24H].Cell_Text,
-                    //    //        Next48h = tableValues[index + k48H].Cell_Text,
-                    //    //        Next72h = tableValues[index + k72H].Cell_Text,
-                    //    //        Next96h = tableValues[index + k96H].Cell_Text,
-                    //    //        Next120h = tableValues[index + k120H].Cell_Text,
-                    //    //    }
-                    //    //};
-                    //    //_db.City.Add(city);
-                    //}
-                    //await _db.SaveChangesAsync();
                 }
                 catch
                 {
@@ -111,8 +92,6 @@ namespace CoteleDunarii.WebServices.WebScrapper
                 index += numberOfRecordsPerRow;
                 hasData = tableValues.Count() > index;
             }
-
-
 
             return true;
         }

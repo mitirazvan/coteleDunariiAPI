@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoteleDunarii.Data\CoteleDunarii.Data.csproj" />
+    <ProjectReference Include="..\CoteleDunarii.Services\CoteleDunarii.Services.csproj" />
   </ItemGroup>
 
 </Project>

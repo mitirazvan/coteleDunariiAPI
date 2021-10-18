@@ -1,4 +1,4 @@
-﻿using CoteleDunarii.Services.DTOs;
+﻿using CoteleDunarii.Services.Dtos;
 using CoteleDunarii.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;

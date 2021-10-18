@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CoteleDunarii.Services.DTOs
+namespace CoteleDunarii.Services.Dtos
 {
     public class CityDto
     {

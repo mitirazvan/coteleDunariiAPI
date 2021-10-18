@@ -2,6 +2,7 @@
 using CoteleDunarii.Repository;
 using CoteleDunarii.Repository.Interfaces;
 using CoteleDunarii.Services;
+using CoteleDunarii.Services.Extensions;
 using CoteleDunarii.Services.Interfaces;
 using CoteleDunarii.WebServices.WebScrapper;
 using Microsoft.AspNetCore.Builder;
@@ -32,15 +33,16 @@ namespace CoteleDunarii
 
             services.AddAutoMapper(typeof(Startup));
 
-            //            Mapper.AssertConfigurationIsValid();
-
             services.AddScoped<IScrapper, AdfjScrapper>();
 
             // Register Repositories
-            services.AddScoped<ICityRepostirory, CityRepository>();
+            services.AddTransient<ICityRepostirory, CityRepository>();
 
             // Register Services
-            services.AddScoped<ICityService, CityService>();
+            services.AddTransient<ICityService, CityService>();
+
+            services.AddCoteleDunariiMapping()
+                .UseCoteleDunariiMappingProfile();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
