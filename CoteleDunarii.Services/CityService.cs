@@ -2,6 +2,7 @@
 using CoteleDunarii.Repository.Interfaces;
 using CoteleDunarii.Services.Dtos;
 using CoteleDunarii.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,18 +19,18 @@ namespace CoteleDunarii.Services
             _mapper = mapper;
         }
 
-        public async Task<List<CityDto>> GetCities()
+        public async Task<List<CityDto>> GetCities(DateTime? minDate = null)
         {
-            var cities = await _cityRepostirory.GetCitiesAsync();
+            var cities = await _cityRepostirory.GetCitiesAsync(minDate);
 
             List<CityDto> dtos = _mapper.Map<List<CityDto>>(cities);
 
             return dtos;
         }
 
-        public async Task<CityDto> GetCity(string name)
+        public async Task<CityDto> GetCity(string name, DateTime? minDate = null)
         {
-            var city = await _cityRepostirory.GetCityAsync(name);
+            var city = await _cityRepostirory.GetCityAsync(name, minDate);
             return _mapper.Map<CityDto>(city);
         }
 

@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.2.14" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CoteleDunarii.Data\CoteleDunarii.Data.csproj" />
   </ItemGroup>
 
