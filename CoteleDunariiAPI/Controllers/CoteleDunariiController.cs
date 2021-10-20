@@ -1,6 +1,7 @@
 ﻿using CoteleDunarii.Services.Dtos;
 using CoteleDunarii.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,15 +20,15 @@ namespace CoteleDunarii.Controllers
 
         // GET: api/CoteleDunarii
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CityDto>>> GetCity()
+        public async Task<ActionResult<IEnumerable<CityDto>>> GetCities(DateTime? minDate = null)
         {
-            return await _service.GetCities();
+            return await _service.GetCities(minDate);
         }
 
         [HttpGet("{name}")]
-        public async Task<ActionResult<CityDto>> GetCity(string name)
+        public async Task<ActionResult<CityDto>> GetCity(string name, DateTime? minDate = null)
         {
-            return await _service.GetCity(name);
+            return await _service.GetCity(name, minDate);
         }
     }
 }

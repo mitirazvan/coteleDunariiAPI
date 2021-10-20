@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 
 namespace CoteleDunarii.Repository
 {
@@ -62,19 +63,25 @@ namespace CoteleDunarii.Repository
             return false;
         }
 
-        public async Task<List<City>> GetCitiesAsync()
+        public async Task<List<City>> GetCitiesAsync(DateTime? minDate = null)
         {
+            if (minDate == null)
+                minDate = DateTime.Today;
+
             return await _context.Cities
-                .Include(y => y.waterEstimations)
-                .Include(z => z.waterInfos)
+                .IncludeFilter(y => y.waterEstimations.Where(y => y.ReadTime >= minDate))
+                .IncludeFilter(z => z.waterInfos.Where(y => y.ReadTime >= minDate))
                 .ToListAsync();
         }
 
-        public async Task<City> GetCityAsync(string name)
+        public async Task<City> GetCityAsync(string name, DateTime? minDate = null)
         {
+            if (minDate == null)
+                minDate = DateTime.Today;
+
             return await _context.Cities.Where(x => x.Name == name)
-                .Include(y => y.waterEstimations)
-                .Include(z => z.waterInfos)
+                .IncludeFilter(y => y.waterEstimations.Where(y => y.ReadTime >= minDate))
+                .IncludeFilter(z => z.waterInfos.Where(y => y.ReadTime >= minDate))
                 .FirstOrDefaultAsync();
         }
 
