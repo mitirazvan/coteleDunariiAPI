@@ -68,10 +68,18 @@ namespace CoteleDunarii.Repository
             if (minDate == null)
                 minDate = DateTime.Today;
 
-            return await _context.Cities
+            var cities = await _context.Cities
                 .IncludeFilter(y => y.waterEstimations.Where(y => y.ReadTime >= minDate))
                 .IncludeFilter(z => z.waterInfos.Where(y => y.ReadTime >= minDate))
                 .ToListAsync();
+
+            foreach (var city in cities)
+            {
+                city.waterEstimations = city.waterEstimations.OrderBy(x => x.ReadTime);
+                city.waterInfos = city.waterInfos.OrderBy(x => x.ReadTime);
+            }
+
+            return cities;
         }
 
         public async Task<City> GetCityAsync(string name, DateTime? minDate = null)
@@ -79,10 +87,15 @@ namespace CoteleDunarii.Repository
             if (minDate == null)
                 minDate = DateTime.Today;
 
-            return await _context.Cities.Where(x => x.Name == name)
+            var result = await _context.Cities.Where(x => x.Name == name)
                 .IncludeFilter(y => y.waterEstimations.Where(y => y.ReadTime >= minDate))
                 .IncludeFilter(z => z.waterInfos.Where(y => y.ReadTime >= minDate))
                 .FirstOrDefaultAsync();
+
+            result.waterEstimations = result.waterEstimations.OrderBy(x => x.ReadTime);
+            result.waterInfos = result.waterInfos.OrderBy(x => x.ReadTime);
+
+            return result;
         }
 
         public async Task<int> GetCityIdAsync(string name)

@@ -1,7 +1,5 @@
-using CoteleDunarii.WebServices.HostedService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
@@ -41,10 +39,6 @@ namespace CoteleDunarii
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .UseSerilog()
-                .ConfigureServices(services =>
-                {
-                    services.AddHostedService<SyncHostedService>();
-                });
+                .UseSerilog();
     }
 }
