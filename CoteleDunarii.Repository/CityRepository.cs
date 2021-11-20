@@ -91,9 +91,11 @@ namespace CoteleDunarii.Repository
                 .IncludeFilter(y => y.waterEstimations.Where(y => y.ReadTime >= minDate))
                 .IncludeFilter(z => z.waterInfos.Where(y => y.ReadTime >= minDate))
                 .FirstOrDefaultAsync();
-
-            result.waterEstimations = result.waterEstimations.OrderBy(x => x.ReadTime);
-            result.waterInfos = result.waterInfos.OrderBy(x => x.ReadTime);
+            
+            if(result != null) {
+                result.waterEstimations = result.waterEstimations.OrderBy(x => x.ReadTime);
+                result.waterInfos = result.waterInfos.OrderBy(x => x.ReadTime);
+            }            
 
             return result;
         }
