@@ -8,8 +8,8 @@ namespace CoteleDunarii.Data.Models
         public string Name { get; set; }
         public string Km { get; set; }
 
-        public IEnumerable<WaterInfo> waterInfos { get; set; }
+        public ICollection<WaterInfo> waterInfos { get; set; }
 
-        public IEnumerable<WaterEstimations> waterEstimations { get; set; }
+        public ICollection<WaterEstimations> waterEstimations { get; set; }
     }
 }

@@ -75,8 +75,8 @@ namespace CoteleDunarii.Repository
 
             foreach (var city in cities)
             {
-                city.waterEstimations = city.waterEstimations.OrderBy(x => x.ReadTime);
-                city.waterInfos = city.waterInfos.OrderBy(x => x.ReadTime);
+                city.waterEstimations = city.waterEstimations.OrderBy(x => x.ReadTime).ToList();
+                city.waterInfos = city.waterInfos.OrderBy(x => x.ReadTime).ToList();
             }
 
             return cities;
@@ -93,8 +93,8 @@ namespace CoteleDunarii.Repository
                 .FirstOrDefaultAsync();
             
             if(result != null) {
-                result.waterEstimations = result.waterEstimations.OrderBy(x => x.ReadTime);
-                result.waterInfos = result.waterInfos.OrderBy(x => x.ReadTime);
+                result.waterEstimations = result.waterEstimations.OrderBy(x => x.ReadTime).ToList();
+                result.waterInfos = result.waterInfos.OrderBy(x => x.ReadTime).ToList();
             }            
 
             return result;
